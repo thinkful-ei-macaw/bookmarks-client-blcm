@@ -1,6 +1,19 @@
 import React, { Component } from 'react';
 
 export default class AddBookmark extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            bookmarks: [],
+            error: false
+        };
+        this.handleAdd = this.handleAdd.bind(this);
+    }
+
+    handleAdd = e => {
+        e.preventDefault();
+        //some event handler code here
+    }
 
     render() {
         return (
