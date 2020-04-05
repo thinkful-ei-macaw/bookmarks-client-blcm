@@ -4,7 +4,7 @@ import { API_KEY, API_ENDPOINT } from './api';
 //images and style
 import './App.css';
 //components
-import BookmarkApp from './components/BookmarkApp';
+import BookmarkList from './components/BookmarkList';
 import AddBookmark from './components/AddBookmark';
 //import { render } from '@testing-library/react';
 
@@ -47,11 +47,7 @@ class App extends Component {
     return (
       <div className="App">
         <AddBookmark />
-        <ul>
-          <li>
-            {this.state.bookmarks}
-          </li>
-        </ul>
+        <BookmarkList />
       </div>
     );
   }    

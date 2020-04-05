@@ -9,7 +9,7 @@ class BookmarkList extends Component {
       <div className="bookmarkList">
         <ul>
           <li>
-            bookmarx go here
+            bookmarks go here
           </li>
         </ul>
       </div>
