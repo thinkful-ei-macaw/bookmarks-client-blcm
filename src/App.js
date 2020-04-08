@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Link } from 'react-router-dom';
-import { API_KEY, API_ENDPOINT } from './api';
+import BookmarksContext from './BookmarksContext';
+import { API_ENDPOINT, API_KEY } from './api';
 //images and style
 import './App.css';
 //components
@@ -16,6 +17,21 @@ class App extends Component {
       error: null
     }
   }
+
+  addBookmark = bookmark => {
+    this.setState({
+      bookmarks: [...this.state.bookmarks, bookmark]
+    })
+  }
+
+  setBookmarks = bookmarks => {
+    this.setState({
+      bookmarks,
+      error: null
+    })
+  }
+
+
 
   async componentDidMount() {
     const request = {
@@ -44,11 +60,34 @@ class App extends Component {
 
 
   render() {
+    const contextValue = {
+      bookmarks: this.state.bookmarks,
+      addBookmark: this.addBookmark,
+      deleteBookmark: this.deleteBookmark,
+      updateBookmark: this.updateBookmark
+    }
     return (
-      <div className="App">
-        <AddBookmark />
-        <BookmarkList />
-      </div>
+      <main className="App">
+        <h1>B00KMARx!</h1>
+        <BookmarksContext.Provider value={contextValue}>
+          <div className="content" >
+            <Route
+            exact
+            path="/"
+            component={BookmarkList}
+            />
+            <Link
+              to={'/'}
+            />
+            <Route
+            exact
+            path="/add-bookmark"
+            component={AddBookmark}
+            />
+            <Link to="/add-bookmark">Add Bookmark</Link>
+          </div>
+        </BookmarksContext.Provider>
+      </main>
     );
   }    
 }
