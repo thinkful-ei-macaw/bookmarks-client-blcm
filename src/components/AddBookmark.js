@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { API_ENDPOINT, API_KEY } from '../api';
+import { API_KEY, API_ENDPOINT} from '../api';
 import PropTypes from 'prop-types';
 
 import BookmarkForm from './BookmarkForm';
@@ -21,35 +21,44 @@ export default class AddBookmark extends Component {
 
     static contextType = BookmarksContext;
 
-    componentDidMount() {
-        this.handleAdd();
-    }
-
-    async handleAdd(bookmark) {
-        this.setState({
-            error: null
+    handleSubmit = (e) => {
+        e.preventDefault()
+        // get the form fields from the event
+        const { title, url, description, rating } = e.target;
+        const bookmark = {
+          title: title.value,
+          url: url.value,
+          description: description.value,
+          rating: rating.value,
+        }
+        this.setState({ error: null })
+        fetch(API_ENDPOINT, {
+          method: 'POST',
+          body: JSON.stringify(bookmark),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': `bearer ${API_KEY}`
+          }
         })
-        //const location = window.location.hostname;
-        const req = {
-            method: 'POST',
-            headers: {
-                'authorization': 'application/json',
-                'content': `bearer ${API_KEY}`
-            },
-            body: JSON.stringify(bookmark)
-        }
-        try {
-            const res = await fetch(API_ENDPOINT, req);
-            const data = await res.json();
-            this.context.addBookmark(data);
-            this.props.history.push('/');
-        } catch (err) {
-            this.setState({
-                error: console.error(err)
-            })
-        }
-
-    }
+          .then(res => {
+            if (!res.ok) {
+              return res.json().then(error => {
+                throw error
+              })
+            }
+            return res.json()
+          })
+          .then(data => {
+            title.value = ''
+            url.value = ''
+            description.value = ''
+            rating.value = ''
+            this.props.onAddBookmark(data)
+          })
+          .catch(error => {
+            this.setState({ error })
+          })
+      }
 
     handleCancel = () => {
         this.props.history.push('/');

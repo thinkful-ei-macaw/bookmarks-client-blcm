@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Route, Link } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import BookmarksContext from './BookmarksContext';
 import { API_ENDPOINT, API_KEY } from './api';
 //images and style
 import './App.css';
 //components
+import NavBar from './components/NavBar';
 import BookmarkList from './components/BookmarkList';
 import AddBookmark from './components/AddBookmark';
 //import { render } from '@testing-library/react';
@@ -31,30 +32,36 @@ class App extends Component {
     })
   }
 
+  deleteBookmark = bookmarkId => {
+    const newBookmarks = this.state.bookmarks.filter(bm =>
+      bm.id !== bookmarkId
+    )
+    this.setState({
+      bookmarks: newBookmarks
+    })
+  }
+
 
 
   async componentDidMount() {
-    const request = {
+    fetch(API_ENDPOINT, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-    }  
-    try {
-      const response = await fetch(API_ENDPOINT, request);
-      const data = await response.json();
-      if (response.ok) {
-        this.setState({
-          bookmarks: data,
-          error: null
-        })
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
       }
-    } catch (err) {
-      this.setState({
-        error: err.message
+    })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(error => Promise.reject(error))
+        }
+        return res.json()
       })
-    }
+      .then(this.setBookmarks)
+      .catch(error => {
+        console.error(error)
+        this.setState({ error })
+      })
   }
 
 
@@ -70,26 +77,22 @@ class App extends Component {
       <main className="App">
         <h1>B00KMARx!</h1>
         <BookmarksContext.Provider value={contextValue}>
-          <div className="content" >
+          <NavBar />
+          <div className='content' >
             <Route
-            exact
-            path="/"
-            component={BookmarkList}
-            />
-            <Link
-              to={'/'}
+              path='/add-bookmark'
+              component={AddBookmark}
             />
             <Route
-            exact
-            path="/add-bookmark"
-            component={AddBookmark}
+              exact
+              path='/'
+              component={BookmarkList}
             />
-            <Link to="/add-bookmark">Add Bookmark</Link>
           </div>
         </BookmarksContext.Provider>
       </main>
     );
-  }    
+  }
 }
 
 export default App;
